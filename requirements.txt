@@ -52,4 +52,5 @@ fpdf==1.7.2
 python-docx
 beautifulsoup4
 openai
+python-dotenv
 
