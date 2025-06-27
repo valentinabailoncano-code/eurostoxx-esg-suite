@@ -44,7 +44,7 @@ Sugiere posibles escenarios de stress test y añade contexto sectorial.
 
         # Llamada a GPT-4
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "Eres un estratega senior de banca privada."},
                 {"role": "user", "content": prompt}
