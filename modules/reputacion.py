@@ -3,58 +3,81 @@ Módulo de análisis reputacional y noticias relevantes
 Autor: Valentina Bailon Cano
 """
 
+import streamlit as st
 import requests
 from bs4 import BeautifulSoup
-import streamlit as st
-import openai
+from openai import OpenAI, OpenAIError
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 def buscar_noticias(empresa: str, max_noticias: int = 3):
     """
-    Busca titulares relevantes en Google News.
+    Busca titulares relevantes de una empresa en Google News.
     """
     query = f"{empresa} noticias"
     url = f"https://www.google.com/search?q={query}&tbm=nws"
     headers = {"User-Agent": "Mozilla/5.0"}
+
     try:
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        st.error("Error al obtener noticias. Intenta de nuevo más tarde.")
-        return []
-    soup = BeautifulSoup(response.text, "html.parser")
-    blocks = soup.select(".dbsr")[:max_noticias]
-    return [f"- [{b.select_one('.nDgy9d').text}]({b.a['href']})" for b in blocks if b.select_one(".nDgy9d")]
+
+        soup = BeautifulSoup(response.text, "html.parser")
+        bloques = soup.select(".dbsr")[:max_noticias]
+
+        noticias = []
+        for b in bloques:
+            titulo = b.select_one('.nDgy9d')
+            link = b.a['href'] if b.a else None
+            if titulo and link:
+                noticias.append(f"- [{titulo.text}]({link})")
+
+        return noticias
+
+    except requests.exceptions.RequestException:
+        return None
+
 
 def mostrar_reputacion(empresa_sel):
     """
-    Sección reputacional: titulares + resumen ESG automático
+    Muestra titulares + resumen reputacional con IA
     """
     st.subheader("🗞️ Reputación y Noticias")
+
     if st.button("Consultar Noticias Relevantes"):
-        noticias = buscar_noticias(empresa_sel)
-        st.markdown("\n".join(noticias))
-        if noticias:
-            resumen_prompt = f"Resumen ESG reputacional sobre estas noticias de {empresa_sel} en español en máximo 5 líneas:\n{chr(10).join(noticias)}"
-            rep = openai.ChatCompletion.create(
-                model='gpt-4',
-                messages=[
-                    {'role': 'system', 'content': 'Analista reputacional institucional.'},
-                    {'role': 'user', 'content': resumen_prompt}
-                ]
-            )
-            st.markdown(rep.choices[0].message['content'])
+        with st.spinner("Buscando titulares y analizando reputación..."):
 
-def analizar_noticias(noticias: list, empresa: str) -> str:
-    # Aquí podrías usar GPT o análisis de sentimiento para generar un resumen reputacional
-    # Por ejemplo:
-    resumen_prompt = f"Resumen ESG reputacional sobre estas noticias de {empresa} en español en máximo 5 líneas:\n{chr(10).join(noticias)}"
+            noticias = buscar_noticias(empresa_sel)
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "Analista reputacional institucional."},
-            {"role": "user", "content": resumen_prompt}
-        ]
-    )
+            if noticias is None:
+                st.error("❌ No se pudieron obtener noticias. Revisa tu conexión o vuelve a intentarlo más tarde.")
+                return
 
-    return response.choices[0].message["content"]
+            if not noticias:
+                st.warning("⚠️ No se encontraron titulares recientes sobre esta empresa.")
+                return
+
+            st.markdown("### 📰 Titulares recientes:")
+            st.markdown("\n".join(noticias))
+
+            try:
+                resumen_prompt = f"Redacta un análisis reputacional institucional (máx 5 líneas) sobre estas noticias recientes de {empresa_sel}:\n\n{chr(10).join(noticias)}"
+
+                client = OpenAI()
+                rep = client.chat.completions.create(
+                    model='gpt-3.5-turbo',
+                    messages=[
+                        {'role': 'system', 'content': 'Eres analista reputacional institucional.'},
+                        {'role': 'user', 'content': resumen_prompt}
+                    ]
+                )
+
+                st.markdown("### 🤖 Resumen Reputacional IA:")
+                st.success(rep.choices[0].message.content)
+
+            except OpenAIError as e:
+                st.error("⚠️ Error al usar OpenAI para generar el resumen.")
+                st.exception(e)
