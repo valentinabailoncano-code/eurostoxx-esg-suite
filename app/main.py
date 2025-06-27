@@ -39,6 +39,9 @@ empresa_sel = [k for k, v in empresas_dict.items() if v == empresa_mostrada][0]
 
 # Obtener nombre completo desde el meta_df (columna 1 = Company)
 nombre_empresa = meta_df[meta_df.iloc[:, 0] == empresa_sel].iloc[0, 1]
+# Eliminar sufijos corporativos como AG, SA, NV, SE, etc.
+sufijos_excluir = ["AG", "SA", "NV", "SE", "Inc.", "Corp", "Group", "Holding", "PLC", "LLC"]
+nombre_limpio = " ".join([palabra for palabra in nombre_empresa.split() if palabra not in sufijos_excluir])
 
 
 # Visualización de indicadores clave
@@ -60,7 +63,7 @@ st.caption("Se recomienda aplicar stress test simulando caídas de ingresos o su
 generar_informe_ia(fin_df, esg_df, empresa_sel)
 
 # Noticias y reputación con IA
-mostrar_reputacion(nombre_empresa)
+mostrar_reputacion(nombre_limpio)
 
 # Footer institucional
 st.markdown('---')
