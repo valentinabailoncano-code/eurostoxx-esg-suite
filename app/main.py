@@ -13,7 +13,7 @@ sys.path.append(os.path.abspath('.'))
 # Importaciones desde los módulos personalizados
 from modules.datos import cargar_datos, extraer_empresas
 from modules.riesgo import calcular_volatilidad, calcular_var, clasificar_riesgo_sector
-from modules.reputacion import buscar_noticias, analizar_noticias
+from modules.reputacion import mostrar_reputacion
 from modules.informe import generar_informe_ia
 from modules.utils_export import exportar_pdf, exportar_docx
 from modules.visual import mostrar_metricas_empresa
@@ -50,13 +50,8 @@ st.caption("Se recomienda aplicar stress test simulando caídas de ingresos o su
 # Generar informe IA
 generar_informe_ia(fin_df, esg_df, empresa_sel)
 
-# Noticias y reputación
-st.subheader("🗞️ Reputación y Noticias")
-noticias = buscar_noticias(empresa_sel)
-if noticias:
-    st.markdown("\n".join(noticias))
-    resumen_reputacion = analizar_noticias(empresa_sel, noticias)
-    st.markdown(resumen_reputacion)
+# Noticias y reputación con IA
+mostrar_reputacion(empresa_sel)
 
 # Footer institucional
 st.markdown('---')
