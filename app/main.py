@@ -32,6 +32,10 @@ fin_df, esg_df, meta_df = cargar_datos()
 empresas = extraer_empresas(fin_df)
 empresa_sel = st.selectbox('Selecciona una empresa del índice:', empresas)
 
+# Obtener nombre completo desde el meta_df (columna 1 = Company)
+nombre_empresa = meta_df[meta_df.iloc[:, 0] == empresa_sel].iloc[0, 1]
+
+
 # Visualización de indicadores clave
 mostrar_metricas_empresa(fin_df, esg_df, empresa_sel)
 
@@ -51,7 +55,7 @@ st.caption("Se recomienda aplicar stress test simulando caídas de ingresos o su
 generar_informe_ia(fin_df, esg_df, empresa_sel)
 
 # Noticias y reputación con IA
-mostrar_reputacion(empresa_sel)
+mostrar_reputacion(nombre_empresa)
 
 # Footer institucional
 st.markdown('---')
