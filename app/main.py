@@ -39,9 +39,10 @@ empresa_sel = [k for k, v in empresas_dict.items() if v == empresa_mostrada][0]
 
 # Obtener nombre completo desde el meta_df (columna 1 = Company)
 nombre_empresa = meta_df[meta_df.iloc[:, 0] == empresa_sel].iloc[0, 1]
-# Eliminar sufijos corporativos como AG, SA, NV, SE, etc.
+
+# Limpieza: eliminar palabras corporativas para scraping más efectivo
 sufijos_excluir = ["AG", "SA", "NV", "SE", "Inc.", "Corp", "Group", "Holding", "PLC", "LLC"]
-nombre_limpio = " ".join([palabra for palabra in nombre_empresa.split() if palabra not in sufijos_excluir])
+nombre_limpio = " ".join([w for w in nombre_empresa.split() if w not in sufijos_excluir])
 
 
 # Visualización de indicadores clave
