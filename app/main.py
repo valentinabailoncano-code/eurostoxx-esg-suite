@@ -29,8 +29,13 @@ st.markdown('''**Desarrollado por Valentina Bailon Cano**
 
 # Cargar datos
 fin_df, esg_df, meta_df = cargar_datos()
-empresas = extraer_empresas(fin_df)
-empresa_sel = st.selectbox('Selecciona una empresa del índice:', empresas)
+empresas_dict = {
+    row[0]: f"{row[0]} – {row[1]}"
+    for _, row in meta_df.iterrows()
+}
+empresa_mostrada = st.selectbox('Selecciona una empresa del índice:', list(empresas_dict.values()))
+empresa_sel = [k for k, v in empresas_dict.items() if v == empresa_mostrada][0]
+
 
 # Obtener nombre completo desde el meta_df (columna 1 = Company)
 nombre_empresa = meta_df[meta_df.iloc[:, 0] == empresa_sel].iloc[0, 1]
