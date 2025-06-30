@@ -1,4 +1,21 @@
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
 .env
-outputs/
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/
+
+# IDEs
+.vscode/
+.idea/
+
+# Datos e informes
+data/*.xlsx
+outputs/*.pdf
+outputs/*.docx
