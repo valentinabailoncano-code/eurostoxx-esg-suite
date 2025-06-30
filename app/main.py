@@ -51,12 +51,9 @@ st.caption("Se recomienda aplicar stress test simulando caídas de ingresos o su
 generar_informe_ia(fin_df, esg_df, empresa_sel)
 
 # Noticias y reputación
-st.subheader("🗞️ Reputación y Noticias")
-noticias = buscar_noticias(empresa_sel)
-if noticias:
-    st.markdown("\n".join(noticias))
-    resumen_reputacion = analizar_noticias(empresa_sel, noticias)
-    st.markdown(resumen_reputacion)
+# Noticias y reputación con IA
+mostrar_reputacion(empresa_sel)
+
 
 # Footer institucional
 st.markdown('---')
